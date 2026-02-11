@@ -1,7 +1,7 @@
 - 👋 Hi, I’m @jastek69
-- 👀 I’m interested in ...blockchain development
-- 🌱 I’m currently learning ... solidity, java, python,truffle
-- 💞️ I’m looking to collaborate on ...blockchain projects
+- 👀 I’m interested in ... Solutions Architect, AI, blockchain development
+- 🌱 I’m currently learning ... solidity, java, python, truffle
+- 💞️ I’m looking to collaborate on ... blockchain projects, DevOps
 - 📫 How to reach me ...jastek.sweeney@gmail.com
 
 <!---
