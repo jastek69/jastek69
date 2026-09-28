@@ -1,0 +1,22 @@
+# This folder is published as github.com/jastek69/jastek69 (profile repo).
+
+# Nested repository — published separately as github.com/jastek69/resume
+resume/
+
+# Verbatim copies of private-repository docs. The portfolio summarizes and
+# links to the repo instead of republishing it. Kept locally, never pushed.
+cloud-architecture-portfolio/architectures/kube-agentic/AGENTS.md
+cloud-architecture-portfolio/architectures/kube-agentic/PLAN.md
+cloud-architecture-portfolio/architectures/kube-agentic/architecture.md
+cloud-architecture-portfolio/architectures/kube-agentic/dgc_vs_mcp.md
+cloud-architecture-portfolio/architectures/legal-platform/AGENTS.md
+cloud-architecture-portfolio/architectures/legal-platform/AGENTS-legal.md
+cloud-architecture-portfolio/images/kube-agentic/agentic-dashboard.html
+
+# Working notes
+arch.txt
+architecture.txt
+cloud-architecture-portfolio/architectures/architecture.txt
+
+# Local tool settings
+.claude/
