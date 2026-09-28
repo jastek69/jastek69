@@ -53,5 +53,5 @@ Vertex AI RAG Engine · text-embedding-005 · Workload Identity Federation · Te
 
 ## Repository links
 
-- Source: local project `gcp/vertex_ai`. Not yet pushed to GitHub.
+- Source: 🔒 [jastek69/vertex_sebekai](https://github.com/jastek69/vertex_sebekai) (private, available for demos)
 - Consumer: [SEIR — Serverless SOAR](../serverless/README.md)
