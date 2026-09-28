@@ -32,4 +32,4 @@
 | AI platform | Amazon Bedrock · Vertex AI RAG · MCP servers · agentic Step Functions loops · Ollama |
 | Languages | Python · Node.js · Solidity · Bash · HCL |
 
-<sub>🔒 Several project repositories are private. Access is available on request.</sub>
+<sub>🔒 Several project repositories are private and available for demos.</sub>
