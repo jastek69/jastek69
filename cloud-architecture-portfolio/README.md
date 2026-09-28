@@ -14,7 +14,7 @@ Project page       — problem · solution · architecture · impact · highligh
 Code repository    — code · install · testing · deployment · implementation detail
 ```
 
-> 🔒 marks a private repository. Access is available on request. Email [jastek.sweeney@gmail.com](mailto:jastek.sweeney@gmail.com).
+> 🔒 marks a private repository. Available for demos. Email [jastek.sweeney@gmail.com](mailto:jastek.sweeney@gmail.com).
 
 ---
 
