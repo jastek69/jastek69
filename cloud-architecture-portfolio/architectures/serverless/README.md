@@ -150,6 +150,23 @@ flowchart LR
     CW --> S3[S3 audit archive optional]
 ```
 
+### Deterministic authority + agentic investigation
+
+Eight layers from signal to human review. Pydantic types every signal, Fusion decides, DynamoDB remembers, S3 proves, and Bedrock explains.
+
+![SEIR platform: security signals → Pydantic domain models → Fusion engine → DynamoDB operational memory → deterministic SOAR and agentic investigation → S3 evidence → MCP control plane → human review](../../images/serverless/executive-workflow.webp)
+
+### Diagram gallery
+
+| Diagram | What it shows |
+|---|---|
+| [End-to-end auth and token/SOAR flow](../../images/serverless/auth-token-soar-flow.jpg) | JWT validation at the API Gateway authorizer; the scheduled unused-token path with a Bedrock narrative |
+| [Agent / WAF-correlation flow](../../images/serverless/waf-correlation-flow.jpg) | Each finding fans out to four parallel agents; threat assessment adds the SOC-report hop |
+| [Trigger topology](../../images/serverless/trigger-topology.webp) | What starts every agent: scheduler, finding event, StartExecution, downstream event, or job failure |
+| [RBAC model and component reference](../../images/serverless/rbac-model.jpg) | The two authorization layers and the question each one answers |
+| [MCP + Sephiroth](../../images/serverless/mcp-sephiroth.jpg) | Hosted MCP under Cognito RBAC for claude.ai, and the EC2 test rig |
+| [Heralds dashboard](../../images/serverless/heralds-dashboard.jpg) · [detection & action](../../images/serverless/heralds-detection-action.jpg) · [agentic tier](../../images/serverless/heralds-agentic.jpg) · [reporting](../../images/serverless/heralds-reporting.jpg) | The operator view of every agent: calls, errors, latency, and triggers |
+
 ## Impact
 
 - **About 420 Terraform resources** across the root stack and modules (jobs, translation), with Cognito, WAF, 14 DynamoDB tables, Step Functions, and a private-VPC RDS intake.
