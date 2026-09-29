@@ -140,7 +140,7 @@ flowchart LR
     L1 -->|Issue/track| DDB1[(DynamoDB token-tracking)]
     L1 -->|Revoke check| DDB2[(DynamoDB token-revocation)]
 
-    SCH[EventBridge Scheduler\nrate(5 minutes)] --> DET[detection Lambda]
+    SCH["EventBridge Scheduler<br/>rate(5 minutes)"] --> DET[detection Lambda]
     DET -->|Mark stale unused| DDB1
     DET -->|Optional revoke entry| DDB2
 
