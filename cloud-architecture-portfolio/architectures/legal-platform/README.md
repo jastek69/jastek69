@@ -145,6 +145,32 @@ flowchart TD
   drafts --> browser
 ```
 
+### Counsel Console screenshots
+
+Shown with test and UAT data. The firm's name, logo, and matter IDs are masked.
+
+**Every matter has a board**
+
+![Matters list: status, attorney, and district per matter](../../images/legal-platform/legal-matters.webp)
+
+![Activity: drafting jobs by agent and matter, parent reminders, and upcoming deadlines](../../images/legal-platform/legal-activity.webp)
+
+**AI proposes; the firm decides**
+
+![Drafts: attorney-only Due Process Complaint with [STUDENT] placeholders](../../images/legal-platform/legal-draft-dpc.webp)
+
+| Legal agents | |
+|---|---|
+| [Control board](../../images/legal-platform/legal-agents-overview.webp) | Fifteen agents with live status and AI usage |
+| [Roster and workflow graph](../../images/legal-platform/legal-agents-detail.webp) | Intake → redact → draft → Bedrock / OAH / MCP, with the dispatcher and agentic DPC path |
+
+**Security isn't bolted on**
+
+| SEIR under the console | |
+|---|---|
+| [SOAR agents](../../images/legal-platform/soar-agents-overview.webp) | Token tracking, WAF correlation, response, and compliance guarding auth and the edge |
+| [SOAR workflow and evidence](../../images/legal-platform/soar-agents-workflow.webp) | Auth → WAF → correlate → SOAR, with reports to S3 under Object Lock |
+
 ## Impact
 
 - **Built for a real practice, not a lab sketch.** It serves attorney and paralegal workflows across two case types with different funding and retention rules.
