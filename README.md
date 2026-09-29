@@ -2,6 +2,8 @@
 
 **Cloud security & AI platform engineer.** I build Terraform-managed systems on AWS, GCP, and Kubernetes where the AI explains and investigates, and deterministic code does the authorizing.
 
+<a href="https://cp.certmetrics.com/amazon/en/public/verify/credential/1d07cad685f4409b948e45bced0370e6" title="Verify: AWS Certified Solutions Architect – Associate"><img src="cloud-architecture-portfolio/images/certifications/aws-saa.png" alt="AWS Certified Solutions Architect – Associate" width="110" align="right"></a>
+
 📂 **[Cloud Architecture Portfolio →](cloud-architecture-portfolio/README.md)** · 📄 [Résumé](https://github.com/jastek69/resume) · 💼 [LinkedIn](https://www.linkedin.com/in/john-sweeney-9b97262/) · 📫 jastek.sweeney@gmail.com
 
 ---
