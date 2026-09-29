@@ -23,7 +23,7 @@ Code repository    — code · install · testing · deployment · implementatio
 | Project | What it demonstrates | Domain |
 |---|---|---|
 | [**SEIR — Serverless SOAR**](architectures/serverless/README.md) | Three-layer RBAC, autonomous WAF correlation → incident response, threat-intel enrichment, and an agentic Bedrock tier behind an MCP control plane. 436 unit tests. | Security / AI Platform |
-| [**SEIR Legal AI**](architectures/legal-platform/README.md) | A production legal-drafting fleet built on the SOAR foundation. Redaction happens before any model sees a document, and IAM enforces it, not prompts. | Security / AI Platform |
+| [**SEIR Legal AI: Legal Case Management AI Platform**](architectures/legal-platform/README.md) | Every matter has a board of deadlines, drafts, and reminders. AI proposes and the firm decides, on SEIR's Cognito, WAF, and SOAR protection. Redaction happens before any model sees a document, and IAM enforces it. | Security / AI Platform |
 | [**Kube Agentic**](architectures/kube-agentic/README.md) | Zero-trust MCP for AI agents on Kubernetes: an mTLS gateway, deterministic playbooks, and gated tool execution. | Kubernetes |
 | [**Zion — Multi-Region Transit Gateway**](architectures/transit-gateway/README.md) | Seven-region AWS footprint, Transit Gateway mesh, geo DNS, Japan-only data residency, self-hosted PLG observability. | Cloud Networking |
 | [**Japan Medical — APPI Cross-Cloud**](architectures/healthcare-cross-platform/README.md) | PHI kept in Tokyo while AWS São Paulo and GCP compute read and write over TGW and HA VPN (BGP), with Bedrock-assisted incident response. | Cloud Networking |
@@ -50,7 +50,7 @@ Most of this portfolio grows out of one platform. **SEIR — Serverless SOAR** i
 ```mermaid
 flowchart TD
     SOAR["SEIR — Serverless SOAR<br/>(parent platform)"]
-    SOAR --> LEGAL["SEIR Legal AI<br/>clone-and-layer"]
+    SOAR --> LEGAL["SEIR Legal AI<br/>case management · clone-and-layer"]
     SOAR --> COMFY["ComfyUI GPU worker<br/>jobs-queue consumer"]
     SOAR --> KUBE["Kube Agentic<br/>same MCP / playbook pattern"]
     SOAR --> VERTEX["Vertex AI RAG<br/>corpora registered in SOAR SSM"]

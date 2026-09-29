@@ -13,7 +13,7 @@
 | | Project | In one line |
 |---|---|---|
 | 🛡️ | [**SEIR — Serverless SOAR**](cloud-architecture-portfolio/architectures/serverless/README.md) | Three-layer RBAC → autonomous WAF correlation → four parallel response agents → agentic Bedrock investigation behind an MCP control plane. 436 tests. |
-| ⚖️ | [**SEIR Legal AI**](cloud-architecture-portfolio/architectures/legal-platform/README.md) | A legal drafting fleet on the SOAR platform. Models only see redacted records, and IAM enforces it, not prompts. |
+| ⚖️ | [**SEIR Legal AI: Legal Case Management AI Platform**](cloud-architecture-portfolio/architectures/legal-platform/README.md) | Every matter has a board of deadlines, drafts, and reminders. AI proposes; the firm decides. Security is built in through SEIR's Cognito, WAF, and SOAR. |
 | ☸️ | [**Kube Agentic**](cloud-architecture-portfolio/architectures/kube-agentic/README.md) | Zero-trust MCP for AI agents on Kubernetes: mTLS identity, deterministic playbooks, gated `kubectl`. |
 | 🌏 | [**Zion — Multi-Region Transit Gateway**](cloud-architecture-portfolio/architectures/transit-gateway/README.md) | Seven AWS regions, TGW mesh, geo DNS, Japan-only data residency, self-hosted PLG observability. |
 | 🏥 | [**Japan Medical — APPI Cross-Cloud**](cloud-architecture-portfolio/architectures/healthcare-cross-platform/README.md) | PHI stays in Tokyo while AWS and GCP compute read and write over TGW and HA VPN with BGP. |

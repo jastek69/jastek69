@@ -1,11 +1,17 @@
-# SEIR Legal AI
+# SEIR Legal AI: Legal Case Management AI Platform
 
 [← Portfolio](../../README.md) · [Security / AI Platform](../../domains/security-ai-platform.md)
 
 **Featured** · Child of [SEIR — Serverless SOAR](../serverless/README.md) · AWS `us-west-2` · 2026
 **Repository:** [jastek69/SEIR-Serverless-SOAR-for-legal-agents](https://github.com/jastek69/SEIR-Serverless-SOAR-for-legal-agents) 🔒
 
-> A case-tracking and drafting fleet for an education-law practice, built as a **clone-and-layer** on the SOAR platform. Attorneys get drafted status reports, case digests, and Due Process Complaints. The models only ever see redacted records, and IAM enforces that, not a prompt.
+> A legal case management AI platform, built as a **clone-and-layer** on the SOAR platform and first deployed for an education-law practice. Attorneys get drafted status reports, case digests, and Due Process Complaints. The models only ever see redacted records, and IAM enforces that, not a prompt.
+
+**Three principles**
+
+1. **Every matter has a board**: deadlines, drafts, and reminders. The platform is built and scaled out per practice area (construction, litigation, civil, and so on), and the same enum rules apply to each one.
+2. **AI proposes; the firm decides.** Agents produce drafts and research aids, never filings.
+3. **Security isn't bolted on.** The platform inherits SEIR's Cognito, WAF, and SOAR protection.
 
 ---
 

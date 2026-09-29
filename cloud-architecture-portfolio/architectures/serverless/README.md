@@ -50,12 +50,6 @@ flowchart TD
     DDB & S3 --> MCP["MCP control plane<br/>26 tools"] --> AN2[Analyst — human review]
 ```
 
-| Auth flow | WAF flow | MCP flow |
-|---|---|---|
-| ![Auth flow](../../diagrams/SEIR-Serverless-SOAR/Infra01-authflow.JPG) | ![WAF flow](../../diagrams/SEIR-Serverless-SOAR/Infra02-WAFflow.JPG) | ![MCP flow](../../diagrams/SEIR-Serverless-SOAR/Infra03-MCPflow.JPG) |
-
-More: [agent triggers](../../diagrams/SEIR-Serverless-SOAR/Infra06-AgentsTriggerTop.JPG) · [DynamoDB memory model](../../diagrams/SEIR-Serverless-SOAR/Infra07-DynamoDBMemory.png) · [infrastructure overview](../../diagrams/SEIR-Serverless-SOAR/Infra01.JPG)
-
 ### DynamoDB system memory
 
 Fourteen tables hold authoritative state. Events route work; agents and MCP tools re-read the table instead of trusting the payload. S3 holds artifacts only.
@@ -172,7 +166,7 @@ Eight layers from signal to human review. Pydantic types every signal, Fusion de
 - **About 420 Terraform resources** across the root stack and modules (jobs, translation), with Cognito, WAF, 14 DynamoDB tables, Step Functions, and a private-VPC RDS intake.
 - **436 pytest + moto unit tests** that need no live AWS, run in GitHub Actions along with `terraform fmt`/`validate`. The same workflows are published as **reusable workflows** that validate three descendant repositories.
 - **Proven degradation path.** On 2026-07-28 a Bedrock billing failure silently degraded every narrative to its template, and the pipeline kept reporting. That incident led to making fallbacks observable.
-- **Parent platform** for the Legal AI fleet, the ComfyUI GPU worker, and the Vertex RAG registry.
+- **Parent platform** for the Legal Case Management AI Platform, the ComfyUI GPU worker, and the Vertex RAG registry.
 
 ## Engineering highlights
 

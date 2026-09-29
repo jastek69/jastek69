@@ -37,9 +37,9 @@ Layered RBAC, token-lifecycle tracking, and autonomous WAF correlation feeding f
 `Terraform` `Lambda` `Cognito` `WAFv2` `Bedrock` `Step Functions` `DynamoDB` `MCP`
 → **Repository:** [jastek69/SEIR-Serverless-SOAR](https://github.com/jastek69/SEIR-Serverless-SOAR) 🔒
 
-### [SEIR Legal AI](../architectures/legal-platform/README.md) · *child of SOAR*
+### [SEIR Legal AI: Legal Case Management AI Platform](../architectures/legal-platform/README.md) · *child of SOAR*
 
-An attorney-facing drafting fleet for an education-law practice: status reports, case digests, and Due Process Complaints drafted only from redacted records. It includes a Counsel Console SPA, a legal MCP server, and OpenSearch retrieval over legal authorities.
+Every matter has a board of deadlines, drafts, and reminders, scaled out per practice area under the same enum rules. AI proposes and the firm decides: status reports, case digests, and Due Process Complaints are drafted only from redacted records, and never filed. It includes a Counsel Console SPA, a legal MCP server, and OpenSearch retrieval over legal authorities, all behind SEIR's Cognito, WAF, and SOAR protection.
 
 `Terraform` `Bedrock` `Comprehend Medical` `OpenSearch` `CloudFront` `Step Functions` `MCP`
 → **Repository:** [jastek69/SEIR-Serverless-SOAR-for-legal-agents](https://github.com/jastek69/SEIR-Serverless-SOAR-for-legal-agents) 🔒
@@ -73,5 +73,5 @@ Four Vertex AI RAG Engine corpora (~1,300 documents) queried from AWS Lambda thr
 
 ## Supporting articles and diagrams
 
-- SOAR architecture diagrams: [auth flow](../diagrams/SEIR-Serverless-SOAR/Infra01-authflow.JPG) · [WAF flow](../diagrams/SEIR-Serverless-SOAR/Infra02-WAFflow.JPG) · [MCP flow](../diagrams/SEIR-Serverless-SOAR/Infra03-MCPflow.JPG) · [agent triggers](../diagrams/SEIR-Serverless-SOAR/Infra06-AgentsTriggerTop.JPG) · [DynamoDB memory](../diagrams/SEIR-Serverless-SOAR/Infra07-DynamoDBMemory.png)
+- SOAR architecture diagrams: [platform poster](../images/serverless/executive-workflow.webp) · [auth flow](../images/serverless/auth-token-soar-flow.jpg) · [WAF flow](../images/serverless/waf-correlation-flow.jpg) · [MCP flow](../images/serverless/mcp-sephiroth.jpg) · [agent triggers](../images/serverless/trigger-topology.webp) · [DynamoDB memory](../architectures/serverless/README.md#dynamodb-system-memory) · [all diagrams](https://jastek69.github.io/resume/architecture.html)
 - Vectors and seed variance: [notes](../vectors/README_vectors_and_seed_variance.md)
