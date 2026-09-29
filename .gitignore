@@ -13,6 +13,10 @@ cloud-architecture-portfolio/architectures/legal-platform/AGENTS.md
 cloud-architecture-portfolio/architectures/legal-platform/AGENTS-legal.md
 cloud-architecture-portfolio/images/kube-agentic/agentic-dashboard.html
 
+# Verbatim private-repo docs kept locally for reference (contain account IDs,
+# live endpoints, test credentials). Diagrams are vetted and published separately.
+cloud-architecture-portfolio/_private-docs/
+
 # Working notes
 arch.txt
 architecture.txt

@@ -50,18 +50,123 @@ flowchart TD
     DDB & S3 --> MCP["MCP control plane<br/>26 tools"] --> AN2[Analyst — human review]
 ```
 
-| Auth flow | WAF flow | MCP flow |
-|---|---|---|
-| ![Auth flow](../../diagrams/SEIR-Serverless-SOAR/Infra01-authflow.JPG) | ![WAF flow](../../diagrams/SEIR-Serverless-SOAR/Infra02-WAFflow.JPG) | ![MCP flow](../../diagrams/SEIR-Serverless-SOAR/Infra03-MCPflow.JPG) |
+### DynamoDB system memory
 
-More: [agent triggers](../../diagrams/SEIR-Serverless-SOAR/Infra06-AgentsTriggerTop.JPG) · [DynamoDB memory model](../../diagrams/SEIR-Serverless-SOAR/Infra07-DynamoDBMemory.png) · [infrastructure overview](../../diagrams/SEIR-Serverless-SOAR/Infra01.JPG)
+Fourteen tables hold authoritative state. Events route work; agents and MCP tools re-read the table instead of trusting the payload. S3 holds artifacts only.
+
+```mermaid
+flowchart TB
+  subgraph ingress["Ingress (not stored in DynamoDB)"]
+    WAF[AWS WAF]
+    EB[EventBridge rules / Scheduler]
+  end
+
+  subgraph cred["Credential safety"]
+    TT[(token-tracking)]
+    TR[(token-revocation)]
+  end
+
+  subgraph detect["Detection pipeline"]
+    WE[(waf-events)]
+    WCF[(waf-correlation-findings)]
+  end
+
+  subgraph respond["Response and intel"]
+    SI[(security-incidents)]
+    ST[(security-threats)]
+    SR[(soc-reports)]
+  end
+
+  subgraph gov["Governance and agentic"]
+    CE[(compliance-evidence)]
+    CF[(compliance-findings)]
+    WI[(waf-investigations)]
+    TI[(token-investigations)]
+    SOI[(soar-interpretations)]
+    EI[(executive-interpretations)]
+  end
+
+  subgraph artifacts["S3 — artifacts only"]
+    S3R[Reports / PDF / MD / JSON]
+    S3T[Investigation transcripts]
+  end
+
+  subgraph control["Control plane"]
+    MCP[MCP read tools]
+  end
+
+  WAF --> WE
+  WE --> WCF
+  EB -->|"seir.waf.correlation (routing only)"| SI
+  EB --> WCF
+  WCF --> SI
+  WCF --> ST
+  ST --> SR
+  SI --> SOI
+  SI --> WI
+  TT --> TI
+  TR --> TT
+  CE --> CF
+  WI --> S3T
+  SI --> S3R
+  SR --> S3R
+
+  MCP --> WCF
+  MCP --> SI
+  MCP --> WI
+  MCP --> TT
+```
+
+### Token lifecycle and layered authorization
+
+Scope check at API Gateway, group check in Lambda, and a scheduled detector that finds issued-but-unused tokens.
+
+```mermaid
+flowchart LR
+    C[Client App] -->|Sign in| CG[Cognito User Pool]
+    CG -->|ID/Access JWT| C
+    C -->|Authorization: Bearer ACCESS_TOKEN| WAF[AWS WAF]
+    WAF --> APIGW[API Gateway REST]
+    APIGW -->|COGNITO_USER_POOLS authorizer + scope| AUTH{JWT and scope valid?}
+    AUTH -->|No| DENY[401/403]
+    AUTH -->|Yes| L1[python_lambda or node_lambda]
+
+    L1 -->|Issue/track| DDB1[(DynamoDB token-tracking)]
+    L1 -->|Revoke check| DDB2[(DynamoDB token-revocation)]
+
+    SCH["EventBridge Scheduler<br/>rate(5 minutes)"] --> DET[detection Lambda]
+    DET -->|Mark stale unused| DDB1
+    DET -->|Optional revoke entry| DDB2
+
+    APIGW --> CW[CloudWatch Logs and Metrics]
+    L1 --> CW
+    DET --> CW
+    CW --> S3[S3 audit archive optional]
+```
+
+### Deterministic authority + agentic investigation
+
+Eight layers from signal to human review. Pydantic types every signal, Fusion decides, DynamoDB remembers, S3 proves, and Bedrock explains.
+
+![SEIR platform: security signals → Pydantic domain models → Fusion engine → DynamoDB operational memory → deterministic SOAR and agentic investigation → S3 evidence → MCP control plane → human review](../../images/serverless/executive-workflow.webp)
+
+### Diagram gallery
+
+| Diagram | What it shows |
+|---|---|
+| [End-to-end auth and token/SOAR flow](../../images/serverless/auth-token-soar-flow.jpg) | JWT validation at the API Gateway authorizer; the scheduled unused-token path with a Bedrock narrative |
+| [Agent / WAF-correlation flow](../../images/serverless/waf-correlation-flow.jpg) | Each finding fans out to four parallel agents; threat assessment adds the SOC-report hop |
+| [Trigger topology](../../images/serverless/trigger-topology.webp) | What starts every agent: scheduler, finding event, StartExecution, downstream event, or job failure |
+| [RBAC model and component reference](../../images/serverless/rbac-model.jpg) | The two authorization layers and the question each one answers |
+| [MCP + Sephiroth](../../images/serverless/mcp-sephiroth.jpg) | Hosted MCP under Cognito RBAC for claude.ai, and the EC2 test rig |
+| [Heralds dashboard](../../images/serverless/heralds-dashboard.jpg) · [detection & action](../../images/serverless/heralds-detection-action.jpg) · [agentic tier](../../images/serverless/heralds-agentic.jpg) · [reporting](../../images/serverless/heralds-reporting.jpg) | The operator view of every agent: calls, errors, latency, and triggers |
 
 ## Impact
 
 - **About 420 Terraform resources** across the root stack and modules (jobs, translation), with Cognito, WAF, 14 DynamoDB tables, Step Functions, and a private-VPC RDS intake.
 - **436 pytest + moto unit tests** that need no live AWS, run in GitHub Actions along with `terraform fmt`/`validate`. The same workflows are published as **reusable workflows** that validate three descendant repositories.
 - **Proven degradation path.** On 2026-07-28 a Bedrock billing failure silently degraded every narrative to its template, and the pipeline kept reporting. That incident led to making fallbacks observable.
-- **Parent platform** for the Legal AI fleet, the ComfyUI GPU worker, and the Vertex RAG registry.
+- **Parent platform** for the Legal Case Management AI Platform, the ComfyUI GPU worker, and the Vertex RAG registry.
 
 ## Engineering highlights
 

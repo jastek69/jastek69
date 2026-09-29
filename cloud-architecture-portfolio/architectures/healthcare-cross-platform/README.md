@@ -42,6 +42,85 @@ flowchart LR
     RDS -. CloudWatch alarm .-> SNS[SNS] --> IR["Evidence bundle Lambda<br/>→ Bedrock incident report"]
 ```
 
+### Full topology
+
+![SEIR Medical topology: Tokyo data authority, São Paulo spoke, GCP New York over HA VPN, and the IR + translation pipeline](../../images/healthcare-cross-platform/seir-medical-topology.png)
+
+### Data paths: PHI only in Tokyo
+
+São Paulo and New York are stateless compute. Every PHI read and write crosses TGW peering or HA VPN into Tokyo.
+
+```mermaid
+flowchart LR
+    D[Doctors worldwide] --> CF["CloudFront + WAF<br/>single URL · TLS · safe-only cache"]
+    CF --> TALB[Tokyo ALB]
+    CF --> SPA[São Paulo ALB]
+    subgraph SP["🇧🇷 São Paulo — stateless"]
+        SPA --> SPASG[EC2 ASG] --> SPTGW[TGW spoke]
+    end
+    subgraph NY["🇺🇸 New York GCP — stateless"]
+        MIG["MIG · no public IPs"] --> ILB["Internal HTTPS ILB<br/>CAS certificate"]
+        MIG --> BGP[Cloud Router — BGP]
+    end
+    subgraph TK["🇯🇵 Tokyo — data authority"]
+        TALB --> TASG[App ASG]
+        TTGW[TGW hub]
+        TASG & TTGW --> RDS[("RDS — PHI<br/>KMS CMK")]
+        SM[Secrets Manager + rotation Lambda] -.-> RDS
+    end
+    SPTGW <==>|TGW peering| TTGW
+    BGP <==>|"HA VPN · 4 IPsec tunnels · BGP"| TTGW
+```
+
+### Origin cloaking
+
+The ALB only answers CloudFront, and only when the secret origin header matches.
+
+```mermaid
+flowchart TD
+    R[Request to ALB] --> SG{"Source in CloudFront<br/>managed prefix list?"}
+    SG -->|no| DROP[SG drop — connection fails]
+    SG -->|yes| H{"Secret origin header<br/>present and correct?"}
+    H -->|no| BLK["Listener default rule → 403"]
+    H -->|yes| APP[Forward to app target group]
+```
+
+### Auto incident response (human in the loop)
+
+Bedrock drafts and Translate localizes. A human verifies alarm, logs, and config before the report is final.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant CW as CloudWatch alarm
+    participant SNS as SNS trigger topic
+    participant L as IR Lambda
+    participant B as Amazon Bedrock
+    participant TR as Amazon Translate
+    participant S3 as S3 IR reports (versioned, SSE)
+    participant H as On-call human
+    CW->>SNS: ALARM
+    SNS->>L: invoke
+    L->>L: collect evidence bundle<br/>(alarm metadata, Logs Insights, config sources)
+    L->>B: draft incident report
+    L->>TR: localized copy
+    L->>S3: report JSON + MD
+    L->>SNS: reports topic → notify
+    H->>S3: retrieve report + evidence
+    H->>H: verify alarm, raw logs, config (runbook steps 2–5)
+    H->>S3: finalize and archive
+```
+
+### Stack dependencies (apply order)
+
+Four independently deployable stacks, wired through remote state.
+
+```mermaid
+flowchart LR
+    SEED[GCP seed] --> T[Tokyo/] --> G[global/] --> N[newyork_gcp/] --> S[saopaulo/]
+    T -. remote state: TGW, VPC, RDS outputs .-> N & S & G
+```
+
 ## Impact
 
 - **About 310 Terraform resources** across two AWS regions and a GCP project, including KMS, Secrets Manager rotation with Lambda, a private CA-issued certificate on the GCP ILB, and private DNS.
