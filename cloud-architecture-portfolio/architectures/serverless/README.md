@@ -56,6 +56,100 @@ flowchart TD
 
 More: [agent triggers](../../diagrams/SEIR-Serverless-SOAR/Infra06-AgentsTriggerTop.JPG) · [DynamoDB memory model](../../diagrams/SEIR-Serverless-SOAR/Infra07-DynamoDBMemory.png) · [infrastructure overview](../../diagrams/SEIR-Serverless-SOAR/Infra01.JPG)
 
+### DynamoDB system memory
+
+Fourteen tables hold authoritative state. Events route work; agents and MCP tools re-read the table instead of trusting the payload. S3 holds artifacts only.
+
+```mermaid
+flowchart TB
+  subgraph ingress["Ingress (not stored in DynamoDB)"]
+    WAF[AWS WAF]
+    EB[EventBridge rules / Scheduler]
+  end
+
+  subgraph cred["Credential safety"]
+    TT[(token-tracking)]
+    TR[(token-revocation)]
+  end
+
+  subgraph detect["Detection pipeline"]
+    WE[(waf-events)]
+    WCF[(waf-correlation-findings)]
+  end
+
+  subgraph respond["Response and intel"]
+    SI[(security-incidents)]
+    ST[(security-threats)]
+    SR[(soc-reports)]
+  end
+
+  subgraph gov["Governance and agentic"]
+    CE[(compliance-evidence)]
+    CF[(compliance-findings)]
+    WI[(waf-investigations)]
+    TI[(token-investigations)]
+    SOI[(soar-interpretations)]
+    EI[(executive-interpretations)]
+  end
+
+  subgraph artifacts["S3 — artifacts only"]
+    S3R[Reports / PDF / MD / JSON]
+    S3T[Investigation transcripts]
+  end
+
+  subgraph control["Control plane"]
+    MCP[MCP read tools]
+  end
+
+  WAF --> WE
+  WE --> WCF
+  EB -->|"seir.waf.correlation (routing only)"| SI
+  EB --> WCF
+  WCF --> SI
+  WCF --> ST
+  ST --> SR
+  SI --> SOI
+  SI --> WI
+  TT --> TI
+  TR --> TT
+  CE --> CF
+  WI --> S3T
+  SI --> S3R
+  SR --> S3R
+
+  MCP --> WCF
+  MCP --> SI
+  MCP --> WI
+  MCP --> TT
+```
+
+### Token lifecycle and layered authorization
+
+Scope check at API Gateway, group check in Lambda, and a scheduled detector that finds issued-but-unused tokens.
+
+```mermaid
+flowchart LR
+    C[Client App] -->|Sign in| CG[Cognito User Pool]
+    CG -->|ID/Access JWT| C
+    C -->|Authorization: Bearer ACCESS_TOKEN| WAF[AWS WAF]
+    WAF --> APIGW[API Gateway REST]
+    APIGW -->|COGNITO_USER_POOLS authorizer + scope| AUTH{JWT and scope valid?}
+    AUTH -->|No| DENY[401/403]
+    AUTH -->|Yes| L1[python_lambda or node_lambda]
+
+    L1 -->|Issue/track| DDB1[(DynamoDB token-tracking)]
+    L1 -->|Revoke check| DDB2[(DynamoDB token-revocation)]
+
+    SCH[EventBridge Scheduler\nrate(5 minutes)] --> DET[detection Lambda]
+    DET -->|Mark stale unused| DDB1
+    DET -->|Optional revoke entry| DDB2
+
+    APIGW --> CW[CloudWatch Logs and Metrics]
+    L1 --> CW
+    DET --> CW
+    CW --> S3[S3 audit archive optional]
+```
+
 ## Impact
 
 - **About 420 Terraform resources** across the root stack and modules (jobs, translation), with Cognito, WAF, 14 DynamoDB tables, Step Functions, and a private-VPC RDS intake.

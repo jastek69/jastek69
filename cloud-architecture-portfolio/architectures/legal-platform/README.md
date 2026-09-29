@@ -49,6 +49,96 @@ flowchart LR
     OS[(OpenSearch<br/>legal authorities)] --> MCPc & BFF
 ```
 
+### RBAC: two layers
+
+The same entitlements apply in the Counsel Console, over MCP, and on raw `/jobs` calls. Paralegals can't submit `dpc_draft`.
+
+```mermaid
+sequenceDiagram
+  participant User as Attorney_or_Paralegal
+  participant UI as Console_or_MCP_or_curl
+  participant Cognito as Cognito_HostedUI
+  participant APIGW as API_Gateway
+  participant Lambda as BFF_or_submit_job
+  participant SQS as Legal_job_queues
+
+  User->>UI: Sign_in
+  UI->>Cognito: Authorization_Code_PKCE
+  Cognito->>User: MFA_TOTP
+  Cognito->>UI: tokens_with_groups_and_scopes
+  UI->>APIGW: Bearer_access_token
+  APIGW->>APIGW: Layer1_scope_rbac_api_user
+  APIGW->>Lambda: forward_JWT_claims
+  Lambda->>Lambda: Layer2_cognito_groups_entitlements
+  Note over Lambda: attorney_all_three_job_types
+  Note over Lambda: paralegal_no_dpc_draft
+  Lambda->>SQS: enqueue_if_entitled
+```
+
+### Backend: drafting, agentic DPC, MCP
+
+Three control planes share one jobs module. Every worker path reads case documents only through the redaction agent.
+
+```mermaid
+flowchart LR
+  subgraph control [Control_planes]
+    MCP[legal_tools_MCP]
+    REST[POST_jobs]
+    PortalBFF[portal_BFF]
+  end
+
+  subgraph jobs [Shared_modules_jobs]
+    Submit[submit_job]
+    Status[get_job_status]
+    Qsr[SQS_status_report]
+    Qdpc[SQS_dpc_draft]
+    Qdig[SQS_case_digest]
+  end
+
+  subgraph workers [Workers]
+    DW[draft_worker]
+    SFN[dpc_agent_SFN]
+    Redact[redaction_agent]
+  end
+
+  MCP --> Submit
+  REST --> Submit
+  PortalBFF --> Submit
+  MCP --> Status
+  PortalBFF --> Status
+  Submit --> Qsr
+  Submit --> Qdpc
+  Submit --> Qdig
+  Qsr --> DW
+  Qdig --> DW
+  Qdpc --> DW
+  DW -->|agentic| SFN
+  DW --> Redact
+  SFN --> Redact
+  DW --> Bedrock[Bedrock_SSM_prompts]
+  SFN --> Bedrock
+```
+
+### Frontend: Counsel Console
+
+A CloudFront SPA with Cognito PKCE + MFA, a JWT-checked BFF, and lexical OpenSearch over administrative decisions.
+
+```mermaid
+flowchart TD
+  browser[Browser] --> cf[CloudFront_SPA]
+  cf --> s3web[S3_portal_assets]
+  browser --> cognito[Cognito_HostedUI_PKCE_MFA]
+  cognito --> browser
+  browser --> bff[HTTP_API_BFF_JWT]
+  bff --> cases[(case_tables)]
+  bff --> submit[jobs_submit]
+  bff --> status[jobs_status]
+  bff --> oah[OpenSearch_OAH_lexical]
+  bff --> drafts[S3_GetObject_drafts]
+  status --> bff
+  drafts --> browser
+```
+
 ## Impact
 
 - **Built for a real practice, not a lab sketch.** It serves attorney and paralegal workflows across two case types with different funding and retention rules.
