@@ -1,0 +1,132 @@
+# Keep portfolio pages in step with the project repos they describe.
+#
+#   - Pull requests: report drift in the job summary (fails only on config errors).
+#   - Weekly / manual / repository_dispatch: run sync.
+#       * synced facts changed  → open or update the `portfolio-sync/auto` PR
+#       * hand-written pages whose sources changed → open or update one
+#         `portfolio-sync` issue (closed automatically once nothing needs review)
+#     Nothing is ever pushed to main. You merge the PR.
+#
+# Secret: PORTFOLIO_READ_TOKEN — fine-grained PAT, Contents: Read-only, on the
+# private source repos listed in .github/portfolio-sync/manifest.json.
+# Without it only public source repos can be read; private ones report errors.
+#
+# This repo is public and most sources are private: reports carry paths and
+# short SHAs only. Verbatim private-repo copies stay local (see .gitignore);
+# sync.py refuses to write a mirror to any path that is not gitignored.
+#
+# Details: .github/portfolio-sync/README.md
+
+name: portfolio-sync
+
+on:
+  schedule:
+    - cron: "0 14 * * 1"   # Mondays 14:00 UTC
+  workflow_dispatch:
+  repository_dispatch:
+    types: [soar-main-pushed, portfolio-source-pushed]
+  pull_request:
+    paths:
+      - ".github/portfolio-sync/**"
+      - ".github/workflows/portfolio-sync.yml"
+      - "cloud-architecture-portfolio/architectures/**"
+
+concurrency:
+  group: portfolio-sync-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check drift
+        env:
+          PORTFOLIO_READ_TOKEN: ${{ secrets.PORTFOLIO_READ_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set +e
+          python3 .github/portfolio-sync/sync.py check --report report.md
+          rc=$?
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+          # 1 = upstream drift (not this PR's fault): report only. 2 = config/fetch errors: fail.
+          [ "$rc" -ne 2 ]
+
+  sync:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-26.04
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      BRANCH: portfolio-sync/auto
+      LABEL: portfolio-sync
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Token notice
+        env:
+          T: ${{ secrets.PORTFOLIO_READ_TOKEN }}
+        run: |
+          if [ -z "$T" ]; then
+            echo "::notice::PORTFOLIO_READ_TOKEN is not set; private source repos will report errors. See .github/portfolio-sync/README.md"
+          fi
+
+      - name: Sync
+        id: sync
+        env:
+          PORTFOLIO_READ_TOKEN: ${{ secrets.PORTFOLIO_READ_TOKEN }}
+        run: |
+          set +e
+          python3 .github/portfolio-sync/sync.py sync --report report.md
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open or update sync PR
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "No synced-fact changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$BRANCH"
+          git commit -qam "Portfolio sync: refresh synced facts from source repos"
+          git push -f origin "$BRANCH"
+          { echo "Automated by \`.github/workflows/portfolio-sync.yml\`. Review, then merge."; echo; cat report.md; } > pr-body.md
+          pr=$(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number')
+          if [ -n "$pr" ]; then
+            gh pr edit "$pr" --body-file pr-body.md
+          else
+            gh pr create --base main --head "$BRANCH" \
+              --title "Portfolio sync: refresh synced facts" --body-file pr-body.md
+          fi
+
+      - name: Open, update, or close review issue
+        run: |
+          set -euo pipefail
+          gh label list --json name -q '.[].name' | grep -Fxq "$LABEL" \
+            || gh label create "$LABEL" --color BFDADC --description "Portfolio page may be stale" || true
+          issue=$(gh issue list --label "$LABEL" --state open --json number -q '.[0].number')
+          if grep -q "^### Needs human review\|^### Errors" report.md; then
+            if [ -n "$issue" ]; then
+              gh issue edit "$issue" --body-file report.md
+            else
+              gh issue create --title "Portfolio pages need review" --label "$LABEL" --body-file report.md
+            fi
+          elif [ -n "$issue" ]; then
+            gh issue close "$issue" --comment "All watched sources are acknowledged. Closing."
+          fi
+
+      - name: Fail on errors
+        if: steps.sync.outputs.rc == '2'
+        run: |
+          echo "::error::portfolio-sync reported errors; see the job summary."
+          exit 1

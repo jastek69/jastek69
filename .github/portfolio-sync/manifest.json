@@ -1,0 +1,34 @@
+{
+  "owner": "jastek69",
+  "pages": [
+    {
+      "page": "cloud-architecture-portfolio/architectures/agent11/README.md",
+      "repo": "armageddon-12E-Agent11",
+      "watch": ["README.md", "docs/TESTING.md"],
+      "blocks": {
+        "tests": {
+          "file": "docs/TESTING.md",
+          "regex": "\\*\\*Result: (\\d+) of (\\d+) pass",
+          "format": "**{1} inline contract tests**, {0} passing"
+        }
+      }
+    },
+    { "page": "cloud-architecture-portfolio/architectures/blockchain/trading-bot-v4.md", "repo": "trading_bot-master", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/blockchain/yield-farm-aave-v3.md", "repo": "YieldFarm", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/comfyui-stability/README.md", "repo": "stability-matrix-headless-aws-infra", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/eks-ebs/README.md", "repo": "anton-basic-eks-updated-helm", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/gcp-hub-spoke/README.md", "repo": "gcp-ha-vpn-hub-spokes-SA-scaffolding", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/healthcare-cross-platform/README.md", "repo": "Armageddon-C7-LAB4-SEIR", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/kube-agentic/README.md", "repo": "kube-agentic", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/kube-agentic/AGENTS.md", "repo": "kube-agentic", "mode": "mirror", "source": "AGENTS.md" },
+    { "page": "cloud-architecture-portfolio/architectures/kube-agentic/PLAN.md", "repo": "kube-agentic", "mode": "mirror", "source": "PLAN.md" },
+    { "page": "cloud-architecture-portfolio/architectures/kube-agentic/architecture.md", "repo": "kube-agentic", "mode": "mirror", "source": "dgc/architecture.md" },
+    { "page": "cloud-architecture-portfolio/architectures/kube-agentic/dgc_vs_mcp.md", "repo": "kube-agentic", "mode": "mirror", "source": "dgc/dgc_vs_mcp.md" },
+    { "page": "cloud-architecture-portfolio/architectures/legal-platform/README.md", "repo": "SEIR-Serverless-SOAR-for-legal-agents", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/legal-platform/AGENTS-legal.md", "repo": "SEIR-Serverless-SOAR-for-legal-agents", "mode": "mirror", "source": "AGENTS-legal.md" },
+    { "page": "cloud-architecture-portfolio/architectures/legal-platform/AGENTS.md", "repo": "SEIR-Serverless-SOAR-for-legal-agents", "mode": "mirror", "source": "AGENTS.md" },
+    { "page": "cloud-architecture-portfolio/architectures/serverless/README.md", "repo": "SEIR-Serverless-SOAR", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/transit-gateway/README.md", "repo": "tfe-zion-armageddon-bhoejm", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/vertex-rag/README.md", "repo": "vertex_sebekai", "watch": ["README.md"] }
+  ]
+}
