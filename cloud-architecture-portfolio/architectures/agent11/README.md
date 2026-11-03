@@ -48,7 +48,7 @@ flowchart TD
 
 - **Worked through as a ten-phase build:** architecture contract → typed models and enums → data policy → runtime registry → network context → routing → MCP → orchestrator → telemetry → failure testing.
 - **Live connectivity labs** run the MCP server on AWS EC2, reach a GCP-hosted Llama over private cloud-to-cloud IPsec, and reach a home-network Ollama as a genuine on-prem integration (RFC 1918 + NAT + public exposure + application-layer protection).
-- **About 430 inline contract tests**, 310 passing. Most of the rest specify registry discovery features written test-first, ahead of the code.
+- **About 440 inline contract tests**, 338 passing. Most of the rest specify registry discovery features written test-first, ahead of the code.
 - The typed-domain-model approach (`BaseModel`, enums, round-trip tests) was carried into the [SEIR SOAR](../serverless/README.md) `models/` package.
 
 ## Engineering highlights
