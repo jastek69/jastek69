@@ -17,6 +17,7 @@
     { "page": "cloud-architecture-portfolio/architectures/blockchain/yield-farm-aave-v3.md", "repo": "YieldFarm", "watch": ["README.md"] },
     { "page": "cloud-architecture-portfolio/architectures/comfyui-stability/README.md", "repo": "stability-matrix-headless-aws-infra", "watch": ["README.md"] },
     { "page": "cloud-architecture-portfolio/architectures/eks-ebs/README.md", "repo": "anton-basic-eks-updated-helm", "watch": ["README.md"] },
+    { "page": "cloud-architecture-portfolio/architectures/eks-ebs/README.md", "repo": "Kubernetes-Kong", "watch": ["README.md"] },
     { "page": "cloud-architecture-portfolio/architectures/gcp-hub-spoke/README.md", "repo": "gcp-ha-vpn-hub-spokes-SA-scaffolding", "watch": ["README.md"] },
     { "page": "cloud-architecture-portfolio/architectures/healthcare-cross-platform/README.md", "repo": "Armageddon-C7-LAB4-SEIR", "watch": ["README.md"] },
     { "page": "cloud-architecture-portfolio/architectures/kube-agentic/README.md", "repo": "kube-agentic", "watch": ["README.md"] },

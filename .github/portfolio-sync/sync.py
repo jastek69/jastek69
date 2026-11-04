@@ -329,9 +329,11 @@ def main() -> int:
     if args.cmd == "ack":
         entries = manifest["pages"] if args.all else [
             e for e in manifest["pages"] if e["page"] in set(args.page)]
-        if not args.all and len(entries) != len(set(args.page)):
+        if not args.all:
             known = {e["page"] for e in manifest["pages"]}
-            sys.exit(f"not in manifest: {sorted(set(args.page) - known)}")
+            unknown = sorted(set(args.page) - known)
+            if unknown:
+                sys.exit(f"not in manifest: {unknown}")
         lines = pin_current(entries, manifest["owner"], pins, until_from_git=False)
     else:
         lines = pin_current(manifest["pages"], manifest["owner"], pins, until_from_git=True)
