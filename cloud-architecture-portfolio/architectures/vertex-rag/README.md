@@ -5,7 +5,7 @@
 **Supporting** · GCP Vertex AI + AWS · Terraform + Python · 2026
 **Repository:** [jastek69/vertex_sebekai](https://github.com/jastek69/vertex_sebekai) 🔒
 
-> A retrieval layer of four Vertex AI RAG Engine corpora, about 1,340 documents on agentic AI, Kubernetes and Argo, LLM inference, and AWS, queried from AWS Lambda agents in the SOAR platform through Workload Identity Federation. No GCP key ever lands in AWS.
+> A retrieval layer of four Vertex AI RAG Engine corpora, about 1,650 documents on agentic AI, Kubernetes and Argo, LLM inference, and AWS, queried from AWS Lambda agents in the SOAR platform through Workload Identity Federation. No GCP key ever lands in AWS.
 
 ---
 
@@ -17,10 +17,10 @@
 
 ## Solution
 
-- **Four purpose-built corpora**, with `text-embedding-005` embeddings on the serverless RAG Engine: `sebek-agentic-ai` (605 files), `sebek-kubernetes-argo` (232), `sebek-llm-inference` (294), and `sebek-aws-idp` (209). A fifth corpus, `sebek-security-ai-docs`, holds reference material uploaded from a local folder.
+- **Four purpose-built corpora**, with `text-embedding-005` embeddings on the serverless RAG Engine: `sebek-agentic-ai` (911 files), `sebek-kubernetes-argo` (232), `sebek-llm-inference` (298), and `sebek-aws-idp` (209). A fifth corpus, `sebek-security-ai-docs` (36), holds reference material uploaded from a local folder.
 - **Keyless cross-cloud identity.** A Terraform-managed service account plus Workload Identity Federation lets AWS Lambda roles call Vertex AI.
 - **Registry in SOAR.** Corpus resource IDs live in SSM (`/rag/*`, `us-west-2`) and are managed by the SOAR Terraform. A break-glass script covers the same keys.
-- **Scheduled corpus sync.** A weekly GitHub Actions job authenticates through its own WIF pool, limited to this repository, mirrors the source bucket to the curated bucket with rclone, and imports into the corpora. The import step currently hits Vertex's per-minute API quota; throttling it is the open fix.
+- **Scheduled corpus sync.** A weekly GitHub Actions job authenticates through its own WIF pool, limited to this repository, mirrors the source bucket to the curated bucket with rclone, and imports into the corpora. The job pages its listings, spaces out corpora, and retries on quota errors to stay within Vertex's per-minute API limit.
 - **Post-retrieval diversity.** `/rag/max-chunks-per-document` caps results per source document, which fixes the single-document dominance that `top_k` alone couldn't.
 
 ## Architecture
@@ -39,7 +39,7 @@ flowchart LR
 
 ## Impact
 
-- **About 1,340 documents** indexed across four corpora, with create, import, list, rebuild, and cleanup scripts.
+- **About 1,650 documents** indexed across four corpora, with create, import, list, rebuild, and cleanup scripts.
 - **Credential-free integration** between the AWS agent platform and GCP retrieval.
 - **Read-only Gemini agent.** A Google ADK agent queries the SOAR hosted MCP with a machine token limited to the user scope, so it can look things up, but the MCP rejects its action tools.
 
