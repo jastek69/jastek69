@@ -3,8 +3,8 @@
 #   - Pull requests: report drift in the job summary (fails only on config errors).
 #   - Weekly / manual / repository_dispatch: run sync.
 #       * synced facts changed  → open or update the `portfolio-sync/auto` PR
-#       * hand-written pages whose sources changed → open or update one
-#         `portfolio-sync` issue (closed automatically once nothing needs review)
+#       * hand-written pages whose sources changed → listed in the run's summary,
+#         with a warning on the run (Actions tab). Issues are off on this repo.
 #     Nothing is ever pushed to main. You merge the PR.
 #
 # Secret: PORTFOLIO_READ_TOKEN — fine-grained PAT, Contents: Read-only, on the
@@ -62,11 +62,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      issues: write
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       BRANCH: portfolio-sync/auto
-      LABEL: portfolio-sync
     steps:
       - uses: actions/checkout@v7
 
@@ -109,20 +107,10 @@ jobs:
               --title "Portfolio sync: refresh synced facts" --body-file pr-body.md
           fi
 
-      - name: Open, update, or close review issue
+      - name: Flag pages needing review
         run: |
-          set -euo pipefail
-          gh label list --json name -q '.[].name' | grep -Fxq "$LABEL" \
-            || gh label create "$LABEL" --color BFDADC --description "Portfolio page may be stale" || true
-          issue=$(gh issue list --label "$LABEL" --state open --json number -q '.[0].number')
-          if grep -q "^### Needs human review\|^### Errors" report.md; then
-            if [ -n "$issue" ]; then
-              gh issue edit "$issue" --body-file report.md
-            else
-              gh issue create --title "Portfolio pages need review" --label "$LABEL" --body-file report.md
-            fi
-          elif [ -n "$issue" ]; then
-            gh issue close "$issue" --comment "All watched sources are acknowledged. Closing."
+          if grep -q "^### Needs human review" report.md; then
+            echo "::warning::Portfolio pages need review. The list is in this run's summary."
           fi
 
       - name: Fail on errors
