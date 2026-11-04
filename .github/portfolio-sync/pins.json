@@ -1,0 +1,58 @@
+{
+  "Armageddon-C7-LAB4-SEIR:README.md": {
+    "blob": "6d3ce1172fe0df007da938e4589a20cfa3ac8cba",
+    "commit": "0b646171cf0ef26b18eb78263c742272a92eb1dd"
+  },
+  "Kubernetes-Kong:README.md": {
+    "blob": "43b468357c6a9025416b2818199a189af035f130",
+    "commit": "f818ea3747305228ff2184839844d03bc80ebaae"
+  },
+  "SEIR-Serverless-SOAR-for-legal-agents:README.md": {
+    "blob": "5fe3d20d8a8d708a000e93657b1d5070d1cd8647",
+    "commit": "0ddc6855686163deb2cd3180e2eddc830f03c9f9"
+  },
+  "SEIR-Serverless-SOAR:README.md": {
+    "blob": "c7618db9ea4c3dfa2de5b5c7e7080f5fb0d5633f",
+    "commit": "f4eefe62457cfab2cfc60819c6a89a9354ec53fc"
+  },
+  "YieldFarm:README.md": {
+    "blob": "ae4a3b9f5d88cc16a5fa8385973a6d05bcacf74f",
+    "commit": "d6fb5e06998f55c9294fce835d9d5afd408ad213"
+  },
+  "anton-basic-eks-updated-helm:README.md": {
+    "blob": "3f54b21b088fdfb8cd17ee5dc157b4e435f83aaf",
+    "commit": "26656006dcda21db0d7df41193189c1179856ae1"
+  },
+  "armageddon-12E-Agent11:README.md": {
+    "blob": "486381dca6a0fac7986a4f864e32b981a07162ad",
+    "commit": "ca2a37775d795830c289d788230e4106c0d3533c"
+  },
+  "armageddon-12E-Agent11:docs/TESTING.md": {
+    "blob": "d1e94f52199ab3825e42d8d8f90660574b6e6ac1",
+    "commit": "ca2a37775d795830c289d788230e4106c0d3533c"
+  },
+  "gcp-ha-vpn-hub-spokes-SA-scaffolding:README.md": {
+    "blob": "e4ef071fac53980f885647534d83c9cf44e3ba93",
+    "commit": "70e6a2bae3404a1caafc89c7d7266bf1afda2c6d"
+  },
+  "kube-agentic:README.md": {
+    "blob": "98994bcf44890554404463ed1a91d5fd914978df",
+    "commit": "ac621e5d58c1677f9a988c9f92771996fbecf00f"
+  },
+  "stability-matrix-headless-aws-infra:README.md": {
+    "blob": "2f0a0afd7a58edf51243913e76ef898799670c50",
+    "commit": "04a38d43143bf95c4c6b5ebed1c27392bbc88881"
+  },
+  "tfe-zion-armageddon-bhoejm:README.md": {
+    "blob": "34fc1d45c32631dbe370cdd21d0aacbb57592cf2",
+    "commit": "36dcb67856a78d850523f594c00c0f778df39a8f"
+  },
+  "trading_bot-master:README.md": {
+    "blob": "fba18575b75a1d2e2378fac14d1c7232028d99af",
+    "commit": "6d0505bed92c91d24e7ba0e3e7054093e908f80b"
+  },
+  "vertex_sebekai:README.md": {
+    "blob": "e5a1307d3f28338f64162d345eeab37ecd53982d",
+    "commit": "b2850380e10c8e169b4a152574c1c51edd8eb753"
+  }
+}
