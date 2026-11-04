@@ -27,11 +27,13 @@ Locally it authenticates with your `gh` login. In CI it uses `PORTFOLIO_READ_TOK
 
 ## Reviewing a page
 
-1. Open the issue's **compare** link to see what changed in the source.
+Issues are off on this repo, so the list of pages to review is in each run's
+summary. Open the **Actions** tab, then the latest `portfolio-sync` run; runs with
+pages to review show a warning. Or run `check` locally.
+
+1. Open the page's **compare** link to see what changed in the source.
 2. Edit the portfolio page, or decide it still holds.
 3. Run `ack --page <path>`, then commit `pins.json` (with the page edit, if any).
-
-The next run closes the issue once nothing is waiting for review.
 
 ## Adding a page
 
