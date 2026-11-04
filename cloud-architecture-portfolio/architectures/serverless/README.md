@@ -24,7 +24,7 @@ Five subsystems, each independently deployable and verifiable:
 |---|---|
 | **Layered authorization** | API Gateway scope gate → in-Lambda group claim check → IAM (service-to-service only). Each layer fails independently. |
 | **Token lifecycle tracking** | DynamoDB stores token hashes, never plaintext. A scheduled detector finds tokens issued but never used, then alerts, revokes, and reports. |
-| **Autonomous correlation & response** | WAF events are scored hourly into findings. EventBridge fans each finding out to four agents in parallel: playbook/incident, token safety, intel enrichment, and threat assessment. |
+| **Autonomous correlation & response** | WAF events are scored hourly into findings. EventBridge fans each finding out to four agents in parallel: playbook/incident, token safety, intel enrichment, and threat assessment. GuardDuty findings take a separate path through the Warlock agent, which maps severity to a playbook, records an incident, and notifies. |
 | **Threat-intel investigation** | AbuseIPDB, CISA KEV, and MITRE ATT&CK enrichment. Confidence escalates when independent sources agree. |
 | **Reporting** | Executive and compliance reports (NIST CSF 2.0, CIS v8, PCI DSS 4.0, ISO 27001) authored by Bedrock as PDF and JSON, in English, Japanese, and Portuguese from one call. |
 
@@ -45,9 +45,10 @@ flowchart TD
     EB --> TS["token-safety agent<br/>observe / flag / deny"]
     EB --> INT["sebek-int-agent<br/>AbuseIPDB · CISA KEV · MITRE"]
     EB --> TH["sebek-threat-agent<br/>Fusion → SOC report"]
+    GD[GuardDuty finding] --> WL["Warlock agent<br/>playbook · incident · SNS/Slack/Jira"] --> DDB
     R --> SFN["Agentic tier<br/>Step Functions + Bedrock Converse<br/>read-only tools"]
-    R & TH & SFN --> S3[(S3 — Object Lock evidence)]
-    DDB & S3 --> MCP["MCP control plane<br/>26 tools"] --> AN2[Analyst — human review]
+    R & TH & SFN --> S3[(S3 — evidence artifacts)]
+    DDB & S3 --> MCP["MCP control plane<br/>40+ tools"] --> AN2[Analyst — human review]
 ```
 
 ### DynamoDB system memory
@@ -163,9 +164,10 @@ Eight layers from signal to human review. Pydantic types every signal, Fusion de
 
 ## Impact
 
-- **About 420 Terraform resources** across the root stack and modules (jobs, translation), with Cognito, WAF, 14 DynamoDB tables, Step Functions, and a private-VPC RDS intake.
-- **436 pytest + moto unit tests** that need no live AWS, run in GitHub Actions along with `terraform fmt`/`validate`. The same workflows are published as **reusable workflows** that validate three descendant repositories.
+- **More than 400 Terraform resource definitions** across the root stack and modules (jobs, soar_console, translation), with Cognito, WAF, 14 DynamoDB tables, Step Functions, and a private-VPC RDS intake.
+- **528 pytest + moto unit tests** that need no live AWS, run in GitHub Actions along with `terraform fmt`/`validate`. The same workflows are published as **reusable workflows** used by four descendant repositories.
 - **Proven degradation path.** On 2026-07-28 a Bedrock billing failure silently degraded every narrative to its template, and the pipeline kept reporting. That incident led to making fallbacks observable.
+- **Evidence outlives the stack.** A separate `audit_archive` Terraform root keeps PII/PHI-redacted reports and logs (Comprehend + Comprehend Medical), plus Terraform state copies, in a KMS-encrypted bucket that routine SOAR destroys don't touch. Object Lock is enabled on that bucket, with default retention currently off.
 - **Parent platform** for the Legal Case Management AI Platform, the ComfyUI GPU worker, and the Vertex RAG registry.
 
 ## Engineering highlights
@@ -178,7 +180,7 @@ Eight layers from signal to human review. Pydantic types every signal, Fusion de
 
 ## Technologies
 
-Terraform · Cognito (MFA, OAuth scopes, PKCE) · API Gateway REST + HTTP · Lambda (Python, Node) · WAFv2 · DynamoDB · S3 Object Lock · RDS MySQL · EventBridge · Step Functions · SNS · Amazon Bedrock · Secrets Manager · SSM · CloudWatch · FastMCP · Slack / Jira · GitHub Actions
+Terraform · Cognito (MFA, OAuth scopes, PKCE) · API Gateway REST + HTTP · Lambda (Python, Node) · WAFv2 · DynamoDB · S3 (Object Lock optional) · RDS MySQL · EventBridge · Step Functions · SNS · Amazon Bedrock · GuardDuty · Comprehend + Comprehend Medical · KMS · Secrets Manager · SSM · CloudWatch · FastMCP · Slack / Jira · GitHub Actions
 
 ## Repository links
 
