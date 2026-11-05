@@ -3,9 +3,9 @@
 [← Portfolio](../../README.md) · [Security / AI Platform](../../domains/security-ai-platform.md)
 
 **Supporting** · GCP Vertex AI + AWS · Terraform + Python · 2026
-**Repository:** not yet published
+**Repository:** [jastek69/vertex_sebekai](https://github.com/jastek69/vertex_sebekai) 🔒
 
-> A retrieval layer of four Vertex AI RAG Engine corpora, about 1,340 documents on agentic AI, Kubernetes and Argo, LLM inference, and AWS, queried from AWS Lambda agents in the SOAR platform through Workload Identity Federation. No GCP key ever lands in AWS.
+> A retrieval layer of four Vertex AI RAG Engine corpora, about 1,650 documents on agentic AI, Kubernetes and Argo, LLM inference, and AWS, queried from AWS Lambda agents in the SOAR platform through Workload Identity Federation. No GCP key ever lands in AWS.
 
 ---
 
@@ -17,9 +17,10 @@
 
 ## Solution
 
-- **Four purpose-built corpora**, with `text-embedding-005` embeddings on the serverless RAG Engine: `sebek-agentic-ai` (605 files), `sebek-kubernetes-argo` (232), `sebek-llm-inference` (294), and `sebek-aws-idp` (209).
+- **Four purpose-built corpora**, with `text-embedding-005` embeddings on the serverless RAG Engine: `sebek-agentic-ai` (911 files), `sebek-kubernetes-argo` (232), `sebek-llm-inference` (298), and `sebek-aws-idp` (209). A fifth corpus, `sebek-security-ai-docs` (36), holds reference material uploaded from a local folder.
 - **Keyless cross-cloud identity.** A Terraform-managed service account plus Workload Identity Federation lets AWS Lambda roles call Vertex AI.
 - **Registry in SOAR.** Corpus resource IDs live in SSM (`/rag/*`, `us-west-2`) and are managed by the SOAR Terraform. A break-glass script covers the same keys.
+- **Scheduled corpus sync.** A weekly GitHub Actions job authenticates through its own WIF pool, limited to this repository, mirrors the source bucket to the curated bucket with rclone, and imports into the corpora. The job pages its listings, spaces out corpora, and retries on quota errors to stay within Vertex's per-minute API limit.
 - **Post-retrieval diversity.** `/rag/max-chunks-per-document` caps results per source document, which fixes the single-document dominance that `top_k` alone couldn't.
 
 ## Architecture
@@ -33,14 +34,14 @@ flowchart LR
     WIF --> SA[GCP service account<br/>least-privilege IAM]
     SA --> RAG["Vertex AI RAG Engine<br/>4 corpora · text-embedding-005"]
     RAG -->|contexts| L
-    DOCS[Curated documents] -->|build_*.py / import| RAG
+    SRC[(Source bucket)] -->|weekly rclone curate| CUR[(Curated bucket)] -->|import| RAG
 ```
 
 ## Impact
 
-- **About 1,340 documents** indexed across four corpora, with create, import, list, rebuild, and cleanup scripts.
+- **About 1,650 documents** indexed across four corpora, with create, import, list, rebuild, and cleanup scripts.
 - **Credential-free integration** between the AWS agent platform and GCP retrieval.
-- Uses the current `agentplatform` client (`google-cloud-aiplatform >= 2.1`) instead of the deprecated `vertexai.rag` module.
+- **Read-only Gemini agent.** A Google ADK agent queries the SOAR hosted MCP with a machine token limited to the user scope, so it can look things up, but the MCP rejects its action tools.
 
 ## Engineering highlights
 
@@ -49,7 +50,7 @@ flowchart LR
 
 ## Technologies
 
-Vertex AI RAG Engine · text-embedding-005 · Workload Identity Federation · Terraform (google provider) · Python · AWS Lambda · SSM Parameter Store · GitHub Actions (corpus sync)
+Vertex AI RAG Engine · text-embedding-005 · Workload Identity Federation · Terraform (google provider) · Python · Google ADK · rclone · AWS Lambda · Amazon Cognito · SSM Parameter Store · GitHub Actions (corpus sync)
 
 ## Repository links
 
